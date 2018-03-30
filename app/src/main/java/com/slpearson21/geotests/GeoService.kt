@@ -161,16 +161,16 @@ class GeoService : IntentService("GeoService") {
 
         if (permissionGranted) {
             val locationApi = LocationServices.getFusedLocationProviderClient(context)
-            locationApi.requestLocationUpdates(getLocationRequest(3000L), getLocationPendingIntent())
-                    .addOnCompleteListener { r ->
-                        if (r.isSuccessful) {
-                            Timber.d("Successfully subscribed to location updates.")
-                            BroadcastLogger.addLog("Successfully subscribed to location updates.")
-                        } else {
-                            Timber.d("Failed to subscribe to location updates.")
-                            BroadcastLogger.addLog("Failed to subscribe to location updates.")
-                        }
-                    }
+            locationApi.requestLocationUpdates(getLocationRequest(POLLING_INTERVAL), getLocationPendingIntent()).run {
+                addOnSuccessListener {
+                    Timber.d("Successfully subscribed to location updates.")
+                    BroadcastLogger.addLog("Successfully subscribed to location updates.")
+                }
+                addOnFailureListener {
+                    Timber.d("Failed to subscribe to location updates.")
+                    BroadcastLogger.addLog("Failed to subscribe to location updates.")
+                }
+            }
         }
     }
 
@@ -180,16 +180,16 @@ class GeoService : IntentService("GeoService") {
 
         if (permissionGranted) {
             val locationApi = LocationServices.getFusedLocationProviderClient(context)
-            locationApi.removeLocationUpdates(getLocationPendingIntent())
-                    .addOnCompleteListener { r ->
-                        if (r.isSuccessful) {
-                            Timber.d("Stopped location tracking")
-                            BroadcastLogger.addLog("Stopped location tracking")
-                        } else {
-                            Timber.d("Failed to stop location tracking")
-                            BroadcastLogger.addLog("Failed to stop location tracking")
-                        }
-                    }
+            locationApi.removeLocationUpdates(getLocationPendingIntent()).run {
+                addOnSuccessListener {
+                    Timber.d("Stopped location tracking")
+                    BroadcastLogger.addLog("Stopped location tracking")
+                }
+                addOnFailureListener {
+                    Timber.d("Failed to stop location tracking")
+                    BroadcastLogger.addLog("Failed to stop location tracking")
+                }
+            }
         }
     }
 
@@ -211,30 +211,30 @@ class GeoService : IntentService("GeoService") {
 
     private fun startActivityTracking() {
         val activityApi = ActivityRecognition.getClient(context)
-        activityApi.requestActivityUpdates(3000L, getActivityPendingIntent())
-                .addOnCompleteListener { r ->
-                    if (r.isSuccessful) {
-                        Timber.d("Successfully subscribed to activity updates.")
-                        BroadcastLogger.addLog("Successfully subscribed to activity updates.")
-                    } else {
-                        Timber.d("Failed to subscribe to activity updates.")
-                        BroadcastLogger.addLog("Failed to subscribe to activity updates.")
-                    }
-                }
+        activityApi.requestActivityUpdates(POLLING_INTERVAL, getActivityPendingIntent()).run {
+            addOnSuccessListener {
+                Timber.d("Successfully subscribed to activity updates.")
+                BroadcastLogger.addLog("Successfully subscribed to activity updates.")
+            }
+            addOnFailureListener {
+                Timber.d("Failed to subscribe to activity updates.")
+                BroadcastLogger.addLog("Failed to subscribe to activity updates.")
+            }
+        }
     }
 
     private fun stopActivityTracking() {
         val activityApi = ActivityRecognition.getClient(context)
-        activityApi.removeActivityUpdates(getActivityPendingIntent())
-                .addOnCompleteListener { r ->
-                    if (r.isSuccessful) {
-                        Timber.d("Stopped activity updates.")
-                        BroadcastLogger.addLog("Stopped activity updates.")
-                    } else {
-                        Timber.d("Failed to stop activity updates.")
-                        BroadcastLogger.addLog("Failed to stop activity updates.")
-                    }
-                }
+        activityApi.removeActivityUpdates(getActivityPendingIntent()).run {
+            addOnSuccessListener {
+                Timber.d("Stopped activity updates.")
+                BroadcastLogger.addLog("Stopped activity updates.")
+            }
+            addOnFailureListener {
+                Timber.d("Failed to stop activity updates.")
+                BroadcastLogger.addLog("Failed to stop activity updates.")
+            }
+        }
     }
 
     private fun getActivityPendingIntent() : PendingIntent {
@@ -250,6 +250,8 @@ class GeoService : IntentService("GeoService") {
         val ACTION_STOP_ACTIVITY_TRACKING = "stop_activity_tracking"
         val ACTION_START_GEOFENCE_TRACKING = "start_geofence_tracking"
         val ACTION_STOP_GEOFENCE_TRACKING = "stop_geofence_tracking"
+
+        private val POLLING_INTERVAL = 3000L
 
         private val ONE_MINUTE_MILLIS: Long = 60 * 1000
         private val ONE_HOUR_MILLIS: Long = 60 * ONE_MINUTE_MILLIS
