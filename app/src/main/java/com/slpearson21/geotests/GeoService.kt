@@ -251,7 +251,7 @@ class GeoService : IntentService("GeoService") {
         val ACTION_START_GEOFENCE_TRACKING = "start_geofence_tracking"
         val ACTION_STOP_GEOFENCE_TRACKING = "stop_geofence_tracking"
 
-        private val POLLING_INTERVAL = 3000L
+        val POLLING_INTERVAL = 3000L
 
         private val ONE_MINUTE_MILLIS: Long = 60 * 1000
         private val ONE_HOUR_MILLIS: Long = 60 * ONE_MINUTE_MILLIS
